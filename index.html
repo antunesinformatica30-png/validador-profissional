@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validador Profissional</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="container">
+        <h1>Validação Profissional</h1>
+
+        <form id="form">
+            <!--email-->
+            <div class="field">
+                <label for="email">Email</label>
+                    <div class="input-box">
+                        <span class="icon">📧</span>
+                        <input type="text" id="email" placeholder="exemplo@empresa.com">
+                        
+                    </div>
+                <small id="emailResult" class="result"></small>
+            </div>
+            <!--senha-->
+            <div class="field">
+                <label for="senha">Senha</label>
+                    <div class="input-box senha-box">
+                        <span class="icon">🔐</span>
+                    <input type="password" id="senha" placeholder="Digite uma senha segura">
+                    <button type="button" id="toggleSenha">👁️</button>
+                </div>
+
+
+            <!--dicas dinâmicas-->
+            <ul id="dicasSenha" class="dicas"></ul>
+            <small id="senhaResult" class="result"></small>
+            </div>
+
+            <!--confirmar senha-->
+            <div class="field">
+                <label for="confirmarSenha">Confirmar Senha</label>
+                <div class="input-box">
+                    <span class="icon">🔐</span>
+                    <input type="password" id="confirmarSenha" placeholder="Repita a Senha">
+                </div>
+            
+            <small id="confirmarResult"></small>
+            </div>
+
+            <!--mensagem final-->
+            <div class="form-feedback">
+                <div id="mensagemFinal" class="mensagem"></div>
+            </div>
+
+            <!--botão com loader-->
+            <button type="submit" id="btnCadastrar">
+                <span id="btnTexto">Cadastrar</span>
+                <span id="btnLoader" class="loader"></span>
+            </button>
+        </form>
+    </main>
+
+<script src="script.js"></script>
+</body>
+</html>
+
+
