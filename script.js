@@ -1,87 +1,150 @@
-console.log("JS carregado");
+console.log("JS Carregado");
 
-// ===== ELEMENTOS ===== //
+//==== ELEMENTOS ====
+
 const form = document.getElementById("form");
+
 const emailInput = document.getElementById("email");
 const senhaInput = document.getElementById("senha");
-const confirmarInput = document.getElementById("confirmarSenha");
+const confirmarSenhaInput = document.getElementById("confirmarSenha");
 
-const emailResult = document.getElementById("emailResult");
-const senhaResult = document.getElementById("senhaResult");
-const confirmarResult = document.getElementById("confirmarResult");
+const emailResultEl = document.getElementById("emailResult");
+const senhaResultEl = document.getElementById("senhaResult");
 
 const mensagemFinal = document.getElementById("mensagemFinal");
+const strengthFill = document.getElementById("strengthFill");
+
 const toggleSenha = document.getElementById("toggleSenha");
 
-// ===== EMAIL ===== //
+//==== EMAIL ====
 function validarEmail(email) {
-    if (!email.includes("@") || !email.includes(".")) {
-        return { mensagem: "Email inválido", classe: "error", valido: false };
+    email = String(email).trim();
+
+    if(!email.includes("@")) {
+        return {mensagem:"Digite um email válido", classe:"error", valido: false};
     }
 
-    const usuario = email.split("@")[0];
+    const partes = email.split("@");
 
-    if (/\d{3,}/.test(usuario)) {
-        return { mensagem: "Evite muitos números", classe: "warn", valido: false };
+    if(partes.length !== 2) {
+        return {mensagem:"Formato do email inválido", classe:"error", valido:false};
     }
 
-    return { mensagem: "Email OK", classe: "ok", valido: true };
+    const usuario = partes [0].toLowerCase();
+    const dominio = partes[1];
+
+    if (!dominio.includes(".")) {
+        return {mensagem: "Domínio inválido", classe: "error", valido: false};
+    }
+
+    const palavrasProibidas = [
+        "princesa", "princesinha", "ninfeta", "gata", "gatinha", "fofa", "baby", "123", "2020"
+    ];
+
+    const nomeValido = /^[a-z]+(\.[a-z]+)+$/.test(usuario);
+    const temPalavraRuim = palavrasProibidas.some(p => usuario.includes(p));
+
+    if (nomeValido || temPalavraRuim) {
+        return {mensagem: "Use nome e sobrenome (ex:joao.silva)", classe: "warn", valido: false};
+    }
+    return {mensagem: "Email profissional", classe: "ok", valido: true};
 }
 
-// ===== SENHA ===== //
+//==== SENHA ====
 function validarSenha(senha) {
-    if (senha.length < 8) {
-        return { mensagem: "Mínimo 8 caracteres", classe: "error", valido: false };
-    }
+    let pontos = 0;
 
-    if (!/[A-Z]/.test(senha)) {
-        return { mensagem: "Use letra maiúscula", classe: "warn", valido: false };
-    }
+    if(senha.length >= 8) pontos++;
+    if (/[A-Z]/.test(senha)) pontos++;
+    if (/[a-z]/.test(senha)) pontos++;
+    if (/[0-9]/.test(senha)) pontos++;
+    if (/[^A-Za-z0-9]/.test(senha)) pontos++;
 
-    if (!/[0-9]/.test(senha)) {
-        return { mensagem: "Use números", classe: "warn", valido: false };
-    }
-
-    return { mensagem: "Senha forte", classe: "ok", valido: true };
+    if (pontos <= 2) {
+        return {mensagem: "Senha fraca", classe: "error", valido: false};
+    } else if (pontos <= 4) {return {mensagem: "Senha média", classe: "warn", valido: false};}
+    return {mensagem: "Senha forte", classe: "ok", valido: true};
 }
 
-// ===== CONFIRMAR ===== //
-function validarConfirmacao(senha, confirmar) {
-    if (senha !== confirmar) {
-        return { mensagem: "Senhas diferentes", classe: "error", valido: false };
-    }
+//==== BARRA SENHA ====
+function atualizarBarraSenha(senha) {
+    if (!strengthFill) return;
 
-    return { mensagem: "Senhas conferem", classe: "ok", valido: true };
+    let pontos = 0;
+
+    if(senha.length >= 8) pontos++;
+    if (/[A-Z]/.test(senha)) pontos++;
+    if (/[a-z]/.test(senha)) pontos++;
+    if (/[0-9]/.test(senha)) pontos++;
+    if (/[^A-Za-z0-9]/.test(senha)) pontos++;
+    
+    strengthFill.className = "";
+
+    if (pontos <= 2) {
+        strengthFill.classList.add("fraca");
+    } else if (pontos <=4) { strengthFill.classList.add("média");}
+    else {strengthFill.classList.add("forte");}
 }
 
-// ===== SUBMIT ===== //
-form.addEventListener("submit", function(e) {
-    e.preventDefault();
+//==== EVENTO INPUT ====
+senhaInput.addEventListener("input", () => {atualizarBarraSenha(senhaInput.value);});
 
-    const email = emailInput.value;
-    const senha = senhaInput.value;
-    const confirmar = confirmarInput.value;
+//==== TOGGLE SENHA ====
+toggleSenha.addEventListener("click", () => {
+    const tipo = senhaInput.type === "password" ? "text" : "password";
 
-    const resEmail = validarEmail(email);
-    const resSenha = validarSenha(senha);
-    const resConfirmar = validarConfirmacao(senha, confirmar);
+    senhaInput.type = tipo;
+    confirmarSenhaInput.type = tipo;
 
-    emailResult.textContent = resEmail.mensagem;
-    senhaResult.textContent = resSenha.mensagem;
-    confirmarResult.textContent = resConfirmar.mensagem;
-
-    if (resEmail.valido && resSenha.valido && resConfirmar.valido) {
-        mensagemFinal.textContent = "Cadastro realizado com sucesso!";
-    } else {
-        mensagemFinal.textContent = "Corrija os erros!";
-    }
+    toggleSenha.textContent = tipo === "password" ? "👀" : "🙈" ;
 });
 
-// ===== OLHO SENHA ===== //
-toggleSenha.addEventListener("click", function() {
-    if (senhaInput.type === "password") {
-        senhaInput.type = "text";
-    } else {
-        senhaInput.type = "password";
-    }
+//==== SUBMIT ====
+form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const email = emailInput.value.trim();
+    const senha = senhaInput.value;
+    const confirmarSenha = confirmarSenhaInput.value;
+
+    const resultadoEmail = validarEmail(email);
+    const resultadoSenha =  validarSenha(senha);
+
+    //===EMAIL===
+    if (emailResultEl) {
+        senhaResultEl.innerText = resultadoEmail.mensagem;
+    } emailInput.className = resultadoEmail.classe;
+
+    //===SENHA===
+    if (senhaResultEl) {
+        senhaResultEl.innerText = resultadoSenha.mensagem;
+    } senhaInput.className = resultadoSenha.classe;
+
+    //===CONFIRMAR SENHA===
+    let senhaConfere = false;
+
+    if (senha === confirmarSenha && senha.length > 0) {
+        senhaConfere = true;
+    } else {if (senhaResultEl){senhaResultEl.innerText = 
+        "Senhas não coincidem";
+    }}
+
+    //===FINAL===
+    if (resultadoEmail.valido && resultadoSenha.valido && senhaConfere) {
+        mensagemFinal.innerText = "Cadastro realizado com sucesso!";
+        mensagemFinal.className = "mensagem sucesso"; 
+        //LIMPAR CAMPOS
+    emailInput.value = "";
+    senhaInput.value = "";
+    confirmarSenhaInput.value = "";
+
+    emailInput.className = "";
+    senhaInput.className = "";
+    strengthFill.className = "";
+
+    emailResultEl.innerText = "";
+    senhaResultEl.innerText = "";
+    } else { mensagemFinal.innerText = "Corrija os erros antes de continuar";
+        mensagemFinal.className = "mensagem erro";
+    }  
 });
